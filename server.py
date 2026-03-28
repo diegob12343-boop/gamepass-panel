@@ -66,7 +66,7 @@ def grant():
     if not ROBLOX_API_KEY:
         return jsonify({"ok": False, "error": "ROBLOX_API_KEY não configurada no servidor"}), 500
 
-    url = f"https://apis.roblox.com/game-passes/v1/games/{universe_id}/game-passes/{pass_id}/users/{user_id}"
+    url = f"https://apis.roblox.com/game-passes/v1/game-passes/{pass_id}/users/{user_id}"
 
     try:
         r = requests.post(
@@ -78,7 +78,7 @@ def grant():
             timeout=10
         )
 
-        if r.status_code == 200:
+        if r.status_code in (200, 204):
             return jsonify({"ok": True, "message": "GamePass concedida com sucesso!"})
         elif r.status_code == 409:
             return jsonify({"ok": True, "message": "Jogador já possui essa GamePass."})
