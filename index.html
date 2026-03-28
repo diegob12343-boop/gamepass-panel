@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GamePass Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#09090b;
+  --s1:#111113;
+  --s2:#18181b;
+  --s3:#222226;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.13);
+  --accent:#22d3a0;
+  --accent-bg:rgba(34,211,160,0.1);
+  --accent-border:rgba(34,211,160,0.25);
+  --red:#f87171;
+  --red-bg:rgba(248,113,113,0.1);
+  --yellow:#fbbf24;
+  --yellow-bg:rgba(251,191,36,0.1);
+  --text:#f4f4f5;
+  --muted:#71717a;
+  --faint:#3f3f46;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Outfit',sans-serif;
+  --r:10px;
+  --r-sm:6px;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:1.5rem;
+}
+
+/* ── LOGIN ── */
+#login{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:1.75rem}
+.brand{text-align:center}
+.brand-icon{
+  width:60px;height:60px;margin:0 auto 1rem;
+  background:var(--accent-bg);border:1px solid var(--accent-border);
+  border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;
+}
+.brand h1{font-size:21px;font-weight:700;letter-spacing:-0.4px}
+.brand p{font-size:12px;color:var(--muted);font-family:var(--mono);margin-top:3px}
+
+.login-card{
+  width:100%;background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:1.75rem;display:flex;flex-direction:column;gap:1.1rem;
+}
+
+label{display:block;font-size:10px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-family:var(--mono);margin-bottom:5px}
+
+input[type=text],input[type=password],input[type=number]{
+  width:100%;background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--r-sm);color:var(--text);font-family:var(--mono);font-size:13px;
+  padding:9px 12px;outline:none;transition:border-color .15s;
+}
+input:focus{border-color:var(--accent)}
+
+.err{
+  background:var(--red-bg);border:1px solid rgba(248,113,113,.25);
+  color:var(--red);font-size:12px;font-family:var(--mono);
+  padding:9px 12px;border-radius:var(--r-sm);display:none;
+}
+
+.btn{
+  width:100%;background:var(--accent);color:#000;font-family:var(--sans);
+  font-weight:700;font-size:14px;border:none;border-radius:var(--r-sm);
+  padding:11px;cursor:pointer;transition:opacity .15s,transform .1s;
+}
+.btn:hover{opacity:.88}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── DASHBOARD ── */
+#dash{display:none;width:100%;max-width:900px;flex-direction:column;gap:1.5rem}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.topbar-left h2{font-size:19px;font-weight:700;letter-spacing:-.4px}
+.topbar-left p{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+
+.pill{
+  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  font-family:var(--mono);padding:4px 10px;border-radius:4px;
+  background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);
+}
+
+.btn-sm{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  font-family:var(--sans);font-size:12px;padding:6px 14px;border-radius:var(--r-sm);
+  cursor:pointer;transition:border-color .15s,color .15s;
+}
+.btn-sm:hover{border-color:var(--red);color:var(--red)}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{
+  background:var(--s1);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:.9rem 1rem;text-align:center;
+}
+.stat-n{font-size:28px;font-weight:700;font-family:var(--mono);color:var(--accent);line-height:1}
+.stat-l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-family:var(--mono);margin-top:5px}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem}
+.card-full{grid-column:1/-1}
+
+.card-label{
+  font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--muted);font-family:var(--mono);margin-bottom:1.1rem;
+  display:flex;align-items:center;gap:7px;
+}
+.card-label::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+.fields{display:flex;flex-direction:column;gap:.9rem}
+
+.row{display:flex;gap:8px;align-items:flex-end}
+.row>div{flex:1}
+
+.btn-green{
+  background:var(--accent);color:#000;border:none;border-radius:var(--r-sm);
+  padding:9px 18px;font-family:var(--sans);font-weight:700;font-size:13px;
+  cursor:pointer;white-space:nowrap;transition:opacity .15s;height:38px;
+}
+.btn-green:hover{opacity:.88}
+.btn-green:disabled{opacity:.4;cursor:not-allowed}
+
+.divider{border:none;border-top:1px solid var(--border);margin:1.1rem 0}
+
+/* queue */
+.queue{display:flex;flex-direction:column;gap:7px;max-height:340px;overflow-y:auto}
+.queue::-webkit-scrollbar{width:3px}
+.queue::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+.q-item{
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:11px 13px;display:flex;align-items:center;gap:10px;
+  animation:slideIn .18s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+.q-info{flex:1;min-width:0}
+.q-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+.q-sub span{color:var(--accent)}
+
+.q-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+
+.dot{width:6px;height:6px;border-radius:50%;background:var(--yellow)}
+.dot.ok{background:var(--accent)}
+.dot.fail{background:var(--red)}
+.dot.pending{animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+.status-txt{font-family:var(--mono);font-size:10px;color:var(--muted)}
+
+.btn-icon{
+  background:transparent;border:1px solid var(--border);color:var(--faint);
+  border-radius:4px;width:26px;height:26px;font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:border-color .15s,color .15s;
+}
+.btn-icon.danger:hover{border-color:var(--red);color:var(--red)}
+.btn-icon.grant:hover{border-color:var(--accent);color:var(--accent)}
+
+.empty{
+  text-align:center;padding:1.75rem 1rem;color:var(--faint);
+  font-family:var(--mono);font-size:11px;border:1px dashed var(--border);border-radius:var(--r-sm);
+}
+
+/* log */
+.log-item{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid var(--border)}
+.log-item:last-child{border-bottom:none}
+.log-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px}
+.log-dot.err{background:var(--red)}
+.log-text{flex:1;font-size:12px;color:var(--text);line-height:1.5}
+.log-time{font-family:var(--mono);font-size:10px;color:var(--faint);flex-shrink:0}
+
+/* toast */
+.toast{
+  position:fixed;bottom:1.75rem;right:1.75rem;
+  font-family:var(--mono);font-size:12px;font-weight:600;
+  padding:10px 18px;border-radius:var(--r-sm);z-index:999;
+  transform:translateY(70px);opacity:0;transition:transform .22s,opacity .22s;
+  pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{background:var(--accent);color:#000}
+.toast.bad{background:var(--red);color:#000}
+
+.spin{display:inline-block;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="brand">
+    <div class="brand-icon">🎮</div>
+    <h1>GamePass Panel</h1>
+    <p>// acesso restrito</p>
+  </div>
+  <div class="login-card">
+    <div>
+      <label>Senha de acesso</label>
+      <input type="password" id="inp-pass" placeholder="••••••••" />
+    </div>
+    <div class="err" id="login-err"></div>
+    <button class="btn" id="btn-login" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h2>🎮 GamePass Panel</h2>
+      <p id="hdr-uid">// universe id: não definido</p>
+    </div>
+    <div class="topbar-right">
+      <span class="pill">ADMIN</span>
+      <button class="btn-sm" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="s-total">0</div><div class="stat-l">Total</div></div>
+    <div class="stat"><div class="stat-n" id="s-pend">0</div><div class="stat-l">Pendentes</div></div>
+    <div class="stat"><div class="stat-n" id="s-ok">0</div><div class="stat-l">Concedidos</div></div>
+  </div>
+
+  <div class="grid">
+    <!-- Formulário -->
+    <div class="card">
+      <div class="card-label">Conceder GamePass</div>
+      <div class="fields">
+        <div>
+          <label>Universe ID do jogo</label>
+          <div class="row">
+            <div><input type="text" id="inp-uid" placeholder="ex: 123456789" /></div>
+            <button class="btn-green" style="font-size:11px;padding:9px 12px" onclick="saveUid()">Salvar</button>
+          </div>
+          <p style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:5px">
+            Encontre em: create.roblox.com → seu jogo → URL
+          </p>
+        </div>
+        <hr class="divider" style="margin:.2rem 0">
+        <div>
+          <label>Nome do jogador (Roblox)</label>
+          <input type="text" id="inp-player" placeholder="ex: PlayerXYZ" />
+        </div>
+        <div>
+          <label>ID da GamePass</label>
+          <input type="text" id="inp-passid" placeholder="ex: 12345678" />
+        </div>
+        <div>
+          <label>Nota (opcional)</label>
+          <input type="text" id="inp-note" placeholder="ex: premiação evento" />
+        </div>
+        <button class="btn-green" id="btn-grant" onclick="grantPass()">⚡ Conceder agora</button>
+      </div>
+    </div>
+
+    <!-- Fila / histórico -->
+    <div class="card">
+      <div class="card-label">Histórico de concessões</div>
+      <div class="queue" id="queue"></div>
+    </div>
+
+    <!-- Log -->
+    <div class="card card-full">
+      <div class="card-label">Log de atividade</div>
+      <div id="log-wrap" style="max-height:160px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "";  // vazio = mesmo domínio
+
+let authd = false;
+let uid = "";
+let items = [];
+let logs = [];
+let stats = {total:0, ok:0};
+
+// ── utils ──────────────────────────────────────────────────────────────────────
+function $(id){ return document.getElementById(id) }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") }
+function ts(){ return new Date().toLocaleTimeString("pt-BR") }
+
+function toast(msg, ok=true){
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = "toast " + (ok ? "ok" : "bad");
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+function load(){
+  try{
+    items = JSON.parse(localStorage.getItem("gp_items")||"[]");
+    logs  = JSON.parse(localStorage.getItem("gp_logs")||"[]");
+    stats = JSON.parse(localStorage.getItem("gp_stats")||'{"total":0,"ok":0}');
+    uid   = localStorage.getItem("gp_uid")||"";
+    if(uid){ $("inp-uid").value = uid; $("hdr-uid").textContent = "// universe id: " + uid; }
+  }catch(e){}
+}
+
+function save(){
+  localStorage.setItem("gp_items", JSON.stringify(items));
+  localStorage.setItem("gp_logs",  JSON.stringify(logs));
+  localStorage.setItem("gp_stats", JSON.stringify(stats));
+  if(uid) localStorage.setItem("gp_uid", uid);
+}
+
+function addLog(text, err=false){
+  logs.unshift({text, err, time: ts()});
+  if(logs.length > 60) logs = logs.slice(0,60);
+}
+
+// ── login ──────────────────────────────────────────────────────────────────────
+async function doLogin(){
+  const pass = $("inp-pass").value;
+  const btn  = $("btn-login");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">⟳</span>';
+
+  try{
+    const r = await fetch(API + "/api/login", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({password: pass})
+    });
+    const d = await r.json();
+    if(d.ok){
+      $("login").style.display = "none";
+      $("dash").style.display  = "flex";
+      load(); render();
+    } else {
+      $("login-err").textContent = d.error || "Senha incorreta.";
+      $("login-err").style.display = "block";
+      $("inp-pass").value = "";
+    }
+  }catch(e){
+    $("login-err").textContent = "Erro de conexão com o servidor.";
+    $("login-err").style.display = "block";
+  }
+
+  btn.disabled = false;
+  btn.textContent = "Entrar";
+}
+
+$("inp-pass").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
+
+function doLogout(){
+  save();
+  $("dash").style.display  = "none";
+  $("login").style.display = "flex";
+  $("inp-pass").value = "";
+}
+
+// ── universe id ────────────────────────────────────────────────────────────────
+function saveUid(){
+  uid = $("inp-uid").value.trim();
+  if(!uid){ toast("Digite o Universe ID", false); return; }
+  localStorage.setItem("gp_uid", uid);
+  $("hdr-uid").textContent = "// universe id: " + uid;
+  toast("Universe ID salvo!");
+}
+
+// ── grant ──────────────────────────────────────────────────────────────────────
+async function grantPass(){
+  const player = $("inp-player").value.trim();
+  const passId = $("inp-passid").value.trim();
+  const note   = $("inp-note").value.trim();
+
+  if(!uid){ toast("Salve o Universe ID primeiro!", false); return; }
+  if(!player||!passId){ toast("Preencha jogador e ID da GamePass", false); return; }
+  if(!/^\d+$/.test(passId)){ toast("ID da GamePass deve ser numérico", false); return; }
+
+  const btn = $("btn-grant");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">⟳</span> Buscando jogador...';
+
+  // 1. Buscar userId
+  let userId;
+  try{
+    const r = await fetch(API + "/api/get-user", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({username: player})
+    });
+    const d = await r.json();
+    if(!d.ok){ toast(d.error, false); btn.disabled=false; btn.textContent="⚡ Conceder agora"; return; }
+    userId = d.userId;
+  }catch(e){
+    toast("Erro ao buscar jogador", false);
+    btn.disabled=false; btn.textContent="⚡ Conceder agora"; return;
+  }
+
+  btn.innerHTML = '<span class="spin">⟳</span> Concedendo...';
+
+  // 2. Conceder
+  const item = {
+    id: Date.now(), player, passId, note,
+    userId, status:"pending", time: ts()
+  };
+  items.unshift(item);
+  stats.total++;
+  render();
+
+  try{
+    const r = await fetch(API + "/api/grant", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({userId, passId: parseInt(passId), universeId: parseInt(uid)})
+    });
+    const d = await r.json();
+
+    if(d.ok){
+      item.status = "ok";
+      stats.ok++;
+      addLog(`✓ GamePass #${passId} concedida para ${player}`);
+      toast(d.message || "GamePass concedida!");
+    } else {
+      item.status = "fail";
+      item.error  = d.error;
+      addLog(`✗ Falha para ${player}: ${d.error}`, true);
+      toast(d.error, false);
+    }
+  }catch(e){
+    item.status = "fail";
+    item.error = e.message;
+    addLog(`✗ Erro de conexão para ${player}`, true);
+    toast("Erro de conexão", false);
+  }
+
+  save(); render();
+  $("inp-player").value = "";
+  $("inp-passid").value = "";
+  $("inp-note").value   = "";
+  btn.disabled=false; btn.textContent="⚡ Conceder agora";
+}
+
+// ── render ─────────────────────────────────────────────────────────────────────
+function render(){
+  // stats
+  $("s-total").textContent = stats.total;
+  $("s-pend").textContent  = items.filter(i=>i.status==="pending").length;
+  $("s-ok").textContent    = stats.ok;
+
+  // queue
+  const q = $("queue");
+  if(!items.length){
+    q.innerHTML = '<div class="empty">Nenhuma concessão ainda.</div>'; 
+  } else {
+    q.innerHTML = items.map(i => {
+      const dotClass = i.status==="ok" ? "ok" : i.status==="fail" ? "fail" : "pending";
+      const statusTxt = i.status==="ok" ? "concedido" : i.status==="fail" ? "erro" : "pendente";
+      return `<div class="q-item">
+        <div class="q-info">
+          <div class="q-name">${esc(i.player)}</div>
+          <div class="q-sub">Pass <span>#${esc(i.passId)}</span>${i.note?" · "+esc(i.note):""}${i.error?" · <span style='color:var(--red)'>"+esc(i.error)+"</span>":""}</div>
+        </div>
+        <div class="q-right">
+          <div class="dot ${dotClass}"></div>
+          <span class="status-txt">${statusTxt}</span>
+          <button class="btn-icon danger" title="Remover" onclick="removeItem(${i.id})">×</button>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  // log
+  const lw = $("log-wrap");
+  if(!logs.length){
+    lw.innerHTML = '<p style="font-family:var(--mono);font-size:11px;color:var(--faint);padding:6px 0">Nenhuma ação registrada.</p>';
+  } else {
+    lw.innerHTML = logs.slice(0,20).map(l => `
+      <div class="log-item">
+        <div class="log-dot ${l.err?"err":""}"></div>
+        <div class="log-text">${esc(l.text)}</div>
+        <div class="log-time">${l.time}</div>
+      </div>`).join("");
+  }
+}
+
+function removeItem(id){
+  items = items.filter(i=>i.id!==id);
+  save(); render();
+}
+</script>
+</body>
+</html>
