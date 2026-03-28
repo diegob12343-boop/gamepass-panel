@@ -12,7 +12,14 @@ ROBLOX_API_KEY  = os.environ.get("ROBLOX_API_KEY", "")
 # ─── Serve o painel ────────────────────────────────────────────────────────────
 @app.route("/")
 def index():
-    return send_from_directory("static", "index.html")
+    # Tenta servir da pasta static, se não existir serve da raiz
+    static_path = os.path.join(app.root_path, "static", "index.html")
+    root_path = os.path.join(app.root_path, "index.html")
+    if os.path.exists(static_path):
+        return send_from_directory("static", "index.html")
+    elif os.path.exists(root_path):
+        return send_from_directory(app.root_path, "index.html")
+    return "Painel não encontrado. Verifique se o index.html está na pasta static.", 404
 
 # ─── Login ─────────────────────────────────────────────────────────────────────
 @app.route("/api/login", methods=["POST"])
